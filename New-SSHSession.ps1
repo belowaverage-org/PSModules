@@ -46,7 +46,7 @@ function Global:Start-SSHSession(
     $Client = ([Renci.SshNet.SshClient]$Session.Client)
     Write-Host -ForegroundColor Yellow "Connecting to: $($Client.ConnectionInfo.Host)..."
     $Client.Connect()
-    $Session.ShellStream = $Client.CreateShellStream("MAIN", 100, 100, 1024, 1024, 1024)
+    $Session.ShellStream = $Client.CreateShellStream("VT100", 100, 100, 1024, 1024, 1024)
     return $Session
 }
 

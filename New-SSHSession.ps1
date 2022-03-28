@@ -1,32 +1,44 @@
-$Global:SSHSessions = [List[SSHSession]]::new()
-
 class SSHSession {
+    static $Sessions = [System.Collections.Generic.List[SSHSession]]::new()
+    [int]$ID
+    [string]$Hostname
+    [string]$User
     [object]$Client
     [object]$ShellStream
     SSHSession($Client) {
         $this.Client = $Client
+        $this.ID = [SSHSession]::Sessions.Count + 1
     }
 }
 
 function Global:Import-SSHModule() {
-    if ((Get-Package -Name SSH.NET).Count -eq 0) {
+    $modPath = "C:\Windows\Temp\SSH.NET\lib\net40\Renci.SshNet.dll"
+    if ((Test-Path -Path $modPath) -eq $false) {
         Write-Host "Installing SSH.NET..."
-        Install-Package SSH.NET -Scope CurrentUser -Force 
+        Invoke-WebRequest -UseBasicParsing -Uri "https://www.nuget.org/api/v2/package/SSH.NET" -OutFile "C:\Windows\Temp\SSH.NET.zip"
+        Expand-Archive -Path "C:\Windows\Temp\SSH.NET.zip" -DestinationPath "C:\Windows\Temp\SSH.NET\"
     }
     $package = Get-Package -Name SSH.NET
     $path = $package.Source | Get-Item
-    $dll = "$($path.Directory.FullName)\lib\net40\Renci.SshNet.dll"
+    $dll = $modPath
     Import-Module $dll
+}
+
+function Global:Get-SSHSession([int]$ID = 0) {
+    if ($ID -ne 0) {
+        return [SSHSession]::Sessions | Where-Object -Property ID -EQ -Value $ID
+    }
+    return [SSHSession]::Sessions
 }
 
 function Global:New-SSHSession(
     [Parameter(Mandatory)][string]$Hostname,
-    [Parameter(Mandatory)][PSCredential]$Credential, 
+    [Parameter(Mandatory)][PSCredential]$Credential,
     [int]$Port = 22
 ) {
     Import-SSHModule
     $Session = [SSHSession]::new([Renci.SshNet.SshClient]::new($Hostname, $Port, $Credential.UserName, $Credential.GetNetworkCredential().Password))
-    $Global:SSHSessions.Add($Session)
+    [SSHSession]::Sessions.Add($Session)
     return $Session
 }
 

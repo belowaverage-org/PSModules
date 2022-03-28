@@ -63,7 +63,8 @@ function Global:Send-SSHCommand(
     [Parameter(Mandatory, ValueFromPipeline)][SSHSession]$Session,
     [Parameter(Mandatory)][string[]]$Commands,
     [Regex]$Expect = [Regex]::new("# "),
-    [TimeSpan]$Timeout = [TimeSpan]::new(0, 0, 30)
+    [TimeSpan]$Timeout = [TimeSpan]::new(0, 0, 30),
+    [switch]$RawOutput = $false
 ) {
     $Client = ([Renci.SshNet.SshClient]$Session.Client)
     $Stream = ([Renci.SshNet.ShellStream]$Session.ShellStream)
@@ -74,7 +75,10 @@ function Global:Send-SSHCommand(
     }
     Write-Host -ForegroundColor Red "Waiting for: $Expect"
     $rawOut = $Stream.Expect($Expect, $Timeout)
-    $clnOut = $rawOut -replace [SSHSession]::VT100RegEx, ""
-    $clnOut = $clnOut -replace [SSHSession]::VT100NewLn, "`r`n"
-    return $clnOut
+    if (-not $RawOutput) {
+        $clnOut = $rawOut -replace [SSHSession]::VT100RegEx, ""
+        $clnOut = $clnOut -replace [SSHSession]::VT100NewLn, "`r`n"
+        return $clnOut
+    }
+    return $rawOut
 }

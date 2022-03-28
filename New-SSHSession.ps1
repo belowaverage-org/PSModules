@@ -1,5 +1,6 @@
 class SSHSession {
-    static $VT100RegEx = "\u001B\[(1M|1L|2K|2J|6n|\?(25h|6l|7h)|[0-9]*;[0-9]*[Hr])"
+    static $VT100RegEx = "\u001B\[(1M|2K|2J|6n|\?(25h|6l|7h)|[0-9]*;[0-9]*[Hr])"
+    static $VT100NewLn = "\u001B\[1L"
     static $Sessions = [System.Collections.Generic.List[SSHSession]]::new()
     [int]$ID
     [string]$Hostname
@@ -74,5 +75,8 @@ function Global:Send-SSHCommand(
         $Stream.WriteLine($cmd)
     }
     Write-Host -ForegroundColor Red "Waiting for: $Expect"
-    return ($Stream.Expect($Expect, $Timeout) -replace [SSHSession]::VT100RegEx, "")
+    $rawOut = $Stream.Expect($Expect, $Timeout)
+    $clnOut = $rawOut -replace [SSHSession]::VT100RegEx, ""
+    $clnOut = $clnOut -replace [SSHSession]::VT100NewLn, "`r`n"
+    return $clnOut
 }

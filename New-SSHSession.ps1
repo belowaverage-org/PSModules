@@ -18,8 +18,6 @@ function Global:Import-SSHModule() {
         Invoke-WebRequest -UseBasicParsing -Uri "https://www.nuget.org/api/v2/package/SSH.NET" -OutFile "C:\Windows\Temp\SSH.NET.zip"
         Expand-Archive -Path "C:\Windows\Temp\SSH.NET.zip" -DestinationPath "C:\Windows\Temp\SSH.NET\"
     }
-    $package = Get-Package -Name SSH.NET
-    $path = $package.Source | Get-Item
     $dll = $modPath
     Import-Module $dll
 }

@@ -17,7 +17,7 @@ Downloads and imports SSH.NET library from MS Nuget.
 
 #### Syntax
 
-`Get-SSHSession [[-ID] `<int>`]`
+`Get-SSHSession [[-ID] <int>]`
 
 #### Remarks
 
@@ -27,7 +27,7 @@ Lists all SSH sessions created. Also pulls a `SSHSession` by ID.
 
 #### Syntax
 
-`New-SSHSession [-Hostname] `<string>` [-Credential] `<pscredential>` [[-Port] `<int>`]`
+`New-SSHSession [-Hostname] <string> [-Credential] <pscredential> [[-Port] <int>]`
 
 #### Remarks
 
@@ -37,7 +37,7 @@ Creates a new `SSHSession` object with the specified parameters.
 
 #### Syntax
 
-`Start-SSHSession [-Session] `<SSHSession>
+`Start-SSHSession [-Session] <SSHSession>`
 
 #### Remarks
 
@@ -48,7 +48,7 @@ accept commands.
 
 #### Syntax
 
-`Start-SSHSession [-Session] `<SSHSession>
+`Start-SSHSession [-Session] <SSHSession>`
 
 #### Remarks
 
@@ -59,7 +59,7 @@ restarted without creating a new `SSHSession` object)
 
 #### Syntax
 
-`Send-SSHCommand [-Session] `<SSHSession>` [-Commands] <string[]> [[-Expect] `<regex>`] [[-Timeout] `<timespan>`] [-RawOutput]`
+`Send-SSHCommand [-Session] <SSHSession> [-Commands] <string[]> [[-Expect] <regex>] [[-Timeout] <timespan>] [-RawOutput]`
 
 #### Remarks
 
@@ -71,12 +71,12 @@ By default this command will wait for a response containing a hashtag.
 return all the text before the hashtag was received.
 
 It is possible to specify a regular expression that the command should
-wait for instead of a hashtag. `-Expect `<regex>
+wait for instead of a hashtag. `-Expect <regex>`
 
 By default this command will wait for a response, but after 30 seconds
 will return anyway (with no data).
 
-It is possible to specify a new timeout. `-Timeout `<timespan>
+It is possible to specify a new timeout. `-Timeout <timespan>`
 
 By default this command will return a filtered output from the SSH
 target. This data usually includes VT100 escape codes, so this command

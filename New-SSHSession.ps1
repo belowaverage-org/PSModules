@@ -3,8 +3,6 @@ class SSHSession {
     static $VT100NewLn = "\u001B\[1L"
     static $Sessions = [System.Collections.Generic.List[SSHSession]]::new()
     [int]$ID
-    [string]$Hostname
-    [string]$User
     [object]$Client
     [object]$ShellStream
     SSHSession($Client) {

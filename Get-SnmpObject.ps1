@@ -1,8 +1,3 @@
-using namespace System.Net
-using namespace System.Collections.Generic
-using namespace Lextm.SharpSnmpLib
-using namespace Lextm.SharpSnmpLib.Messaging
-
 function Global:Import-SNMPModule() {
     $modPath = "C:\Windows\Temp\Lextm.SharpSnmpLib\lib\net471\SharpSnmpLib.dll"
     if ((Test-Path -Path $modPath) -eq $false) {
@@ -17,10 +12,10 @@ function Global:Import-SNMPModule() {
 function Global:ConvertTo-IPEndPoint([string]$Hostname, [int]$Port) {
     try {
         $IP = $null
-        if (-not [IPAddress]::TryParse($Hostname, [ref] $IP)) {
-            $IP = [IPAddress]::Parse((Resolve-DnsName -ErrorAction SilentlyContinue -Name $Hostname).IPAddress)
+        if (-not [System.Net.IPAddress]::TryParse($Hostname, [ref] $IP)) {
+            $IP = [System.Net.IPAddress]::Parse((Resolve-DnsName -ErrorAction SilentlyContinue -Name $Hostname).IPAddress)
         }
-        return [IPEndpoint]::new($IP, $Port)
+        return [System.Net.IPEndpoint]::new($IP, $Port)
     } catch {
         throw [System.Exception]::new("Could not convert. Hostname not resolved?")
         return $null
@@ -38,13 +33,13 @@ function Global:Get-SnmpObject(
     Import-SNMPModule
     $snmpVer = [System.Enum]::Parse([Lextm.SharpSnmpLib.VersionCode], $Version)
     $ipEndpoint = ConvertTo-IPEndPoint -Hostname $Hostname -Port $Port
-    $octetCommunity = [OctetString]::new($Community)
-    $vars = [List[Variable]]::new()
+    $octetCommunity = [Lextm.SharpSnmpLib.OctetString]::new($Community)
+    $vars = [System.Collections.Generic.List[Lextm.SharpSnmpLib.Variable]]::new()
     foreach ($oid in $OIDs) {
-        $parsedOID = [Variable]::new([ObjectIdentifier]::new($oid))
+        $parsedOID = [Lextm.SharpSnmpLib.Variable]::new([Lextm.SharpSnmpLib.ObjectIdentifier]::new($oid))
         $vars.Add($parsedOID)
     }
-    return [Messenger]::Get(
+    return [Lextm.SharpSnmpLib.Messaging.Messenger]::Get(
         $snmpVer,
         $ipEndpoint,
         $octetCommunity,

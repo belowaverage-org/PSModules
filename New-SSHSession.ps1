@@ -9,6 +9,10 @@ class SSHSession {
         $this.Client = $Client
         $this.ID = [SSHSession]::Sessions.Count + 1
     }
+    [bool]IsConnected() {
+        if ($null -eq $this.Client) { return $false }
+        return $this.Client.IsConnected
+    }
 }
 
 function Global:Import-SSHModule() {

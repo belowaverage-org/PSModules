@@ -30,22 +30,26 @@ function Global:Get-SnmpObject(
     [string]$Version = "V2",
     [int]$Timeout = 1000
 ) {
-    Import-SNMPModule
+    begin { Import-SNMPModule }
     process {
-        $snmpVer = [System.Enum]::Parse([Lextm.SharpSnmpLib.VersionCode], $Version)
-        $ipEndpoint = ConvertTo-IPEndPoint -Hostname $Hostname -Port $Port
-        $octetCommunity = [Lextm.SharpSnmpLib.OctetString]::new($Community)
-        $vars = [System.Collections.Generic.List[Lextm.SharpSnmpLib.Variable]]::new()
-        foreach ($oid in $OIDs) {
-            $parsedOID = [Lextm.SharpSnmpLib.Variable]::new([Lextm.SharpSnmpLib.ObjectIdentifier]::new($oid))
-            $vars.Add($parsedOID)
+        try {
+            $snmpVer = [System.Enum]::Parse([Lextm.SharpSnmpLib.VersionCode], $Version)
+            $ipEndpoint = ConvertTo-IPEndPoint -Hostname $Hostname -Port $Port
+            $octetCommunity = [Lextm.SharpSnmpLib.OctetString]::new($Community)
+            $vars = [System.Collections.Generic.List[Lextm.SharpSnmpLib.Variable]]::new()
+            foreach ($oid in $OIDs) {
+                $parsedOID = [Lextm.SharpSnmpLib.Variable]::new([Lextm.SharpSnmpLib.ObjectIdentifier]::new($oid))
+                $vars.Add($parsedOID)
+            }
+            [Lextm.SharpSnmpLib.Messaging.Messenger]::Get(
+                $snmpVer,
+                $ipEndpoint,
+                $octetCommunity,
+                $vars,
+                $Timeout
+            )
+        } catch {
+            Write-Host -ForegroundColor Yellow "Failed to connect / receive SNMP object: $Hostname."
         }
-        [Lextm.SharpSnmpLib.Messaging.Messenger]::Get(
-            $snmpVer,
-            $ipEndpoint,
-            $octetCommunity,
-            $vars,
-            $Timeout
-        )
     }
 }

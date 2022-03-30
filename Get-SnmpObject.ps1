@@ -23,7 +23,7 @@ function Global:ConvertTo-IPEndPoint([string]$Hostname, [int]$Port) {
 }
 
 function Global:Get-SnmpObject(
-    [string]$Hostname,
+    [Parameter(Mandatory=$true,ValueFromPipeline=$true)][string]$Hostname,
     [int]$Port = 161,
     [string]$Community = "public",
     [string[]]$OIDs = ".1.3.6.1.2.1.1.1.0",
@@ -31,19 +31,21 @@ function Global:Get-SnmpObject(
     [int]$Timeout = 1000
 ) {
     Import-SNMPModule
-    $snmpVer = [System.Enum]::Parse([Lextm.SharpSnmpLib.VersionCode], $Version)
-    $ipEndpoint = ConvertTo-IPEndPoint -Hostname $Hostname -Port $Port
-    $octetCommunity = [Lextm.SharpSnmpLib.OctetString]::new($Community)
-    $vars = [System.Collections.Generic.List[Lextm.SharpSnmpLib.Variable]]::new()
-    foreach ($oid in $OIDs) {
-        $parsedOID = [Lextm.SharpSnmpLib.Variable]::new([Lextm.SharpSnmpLib.ObjectIdentifier]::new($oid))
-        $vars.Add($parsedOID)
+    process {
+        $snmpVer = [System.Enum]::Parse([Lextm.SharpSnmpLib.VersionCode], $Version)
+        $ipEndpoint = ConvertTo-IPEndPoint -Hostname $Hostname -Port $Port
+        $octetCommunity = [Lextm.SharpSnmpLib.OctetString]::new($Community)
+        $vars = [System.Collections.Generic.List[Lextm.SharpSnmpLib.Variable]]::new()
+        foreach ($oid in $OIDs) {
+            $parsedOID = [Lextm.SharpSnmpLib.Variable]::new([Lextm.SharpSnmpLib.ObjectIdentifier]::new($oid))
+            $vars.Add($parsedOID)
+        }
+        [Lextm.SharpSnmpLib.Messaging.Messenger]::Get(
+            $snmpVer,
+            $ipEndpoint,
+            $octetCommunity,
+            $vars,
+            $Timeout
+        )
     }
-    return [Lextm.SharpSnmpLib.Messaging.Messenger]::Get(
-        $snmpVer,
-        $ipEndpoint,
-        $octetCommunity,
-        $vars,
-        $Timeout
-    )
 }

@@ -90,8 +90,6 @@ escape codes. `-RawOutput`
 ### Pull a switch running config:
 
 ``` powershell
-#Import the PSWiki command-lets.
-Enter-PSWiki
 
 #Create a new SSHSession and then connect.
 $session = New-SSHSession | Start-SSHSession
@@ -111,8 +109,6 @@ $_ = $session | Stop-SSHSession
 ### Pull an HP switch firmware version:
 
 ``` powershell
-#Import the PSWiki command-lets.
-Enter-PSWiki
 
 #Create a new SSHSession and then connect.
 $session = New-SSHSession | Start-SSHSession

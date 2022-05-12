@@ -1,3 +1,4 @@
+<#PSWiki#>
 function Global:Import-SNMPModule() {
     $modPath = "C:\Windows\Temp\Lextm.SharpSnmpLib\lib\net471\SharpSnmpLib.dll"
     if ((Test-Path -Path $modPath) -eq $false) {
@@ -83,3 +84,38 @@ function Global:Get-SnmpTable(
         }
     }
 }
+
+function Global:Walk-SnmpObject(
+    [Parameter(Mandatory=$true,ValueFromPipeline=$true)][string]$Hostname,
+    [int]$Port = 161,
+    [string]$Community = "public",
+    [string]$OID = ".1.3.6.1.2.1.1.1.0",
+    [string]$Version = "V2",
+    [int]$Timeout = 100,
+    [string]$Mode = "WithinSubtree"
+) {
+    begin { Import-SNMPModule }
+    process {
+        try {
+            $snmpVer = [System.Enum]::Parse([Lextm.SharpSnmpLib.VersionCode], $Version)
+            $walkMode = [System.Enum]::Parse([Lextm.SharpSnmpLib.Messaging.WalkMode], $Mode)
+            $ipEndpoint = ConvertTo-IPEndPoint -Hostname $Hostname -Port $Port
+            $octetCommunity = [Lextm.SharpSnmpLib.OctetString]::new($Community)
+            $oOID = [Lextm.SharpSnmpLib.ObjectIdentifier]::new($OID)
+            $oList = [System.Collections.Generic.List[Lextm.SharpSnmpLib.Variable]]::new()
+            [Lextm.SharpSnmpLib.Messaging.Messenger]::Walk(
+                $snmpVer,
+                $ipEndpoint,
+                $octetCommunity,
+                $oOID,
+                $oList,
+                $Timeout,
+                $walkMode
+            )
+            $oList
+        } catch {
+            Write-Verbose "Failed to connect / receive SNMP object: $Hostname."
+        }
+    }
+}
+<#/PSWiki#>

@@ -28,7 +28,7 @@ function Global:Get-SnmpObject(
     [string]$Community = "public",
     [string[]]$OIDs = ".1.3.6.1.2.1.1.1.0",
     [string]$Version = "V2",
-    [int]$Timeout = 1000
+    [int]$Timeout = 100
 ) {
     begin { Import-SNMPModule }
     process {
@@ -49,7 +49,37 @@ function Global:Get-SnmpObject(
                 $Timeout
             )
         } catch {
-            Write-Host -ForegroundColor Yellow "Failed to connect / receive SNMP object: $Hostname."
+            Write-Verbose "Failed to connect / receive SNMP object: $Hostname."
+        }
+    }
+}
+
+function Global:Get-SnmpTable(
+    [Parameter(Mandatory=$true,ValueFromPipeline=$true)][string]$Hostname,
+    [int]$Port = 161,
+    [string]$Community = "public",
+    [string]$OID = ".1.3.6.1.2.1.1.1.0",
+    [string]$Version = "V2",
+    [int]$Timeout = 100,
+    [int]$MaxRepetitions = [int]::MaxValue
+) {
+    begin { Import-SNMPModule }
+    process {
+        try {
+            $snmpVer = [System.Enum]::Parse([Lextm.SharpSnmpLib.VersionCode], $Version)
+            $ipEndpoint = ConvertTo-IPEndPoint -Hostname $Hostname -Port $Port
+            $octetCommunity = [Lextm.SharpSnmpLib.OctetString]::new($Community)
+            $oOID = [Lextm.SharpSnmpLib.ObjectIdentifier]::new($OID)
+            [Lextm.SharpSnmpLib.Messaging.Messenger]::GetTable(
+                $snmpVer,
+                $ipEndpoint,
+                $octetCommunity,
+                $oOID,
+                $Timeout,
+                $MaxRepetitions
+            )
+        } catch {
+            Write-Verbose "Failed to connect / receive SNMP object: $Hostname."
         }
     }
 }

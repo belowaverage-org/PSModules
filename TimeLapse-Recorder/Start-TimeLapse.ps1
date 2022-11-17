@@ -1,9 +1,10 @@
 $global:VIDS_FOLDER  = ".\vids"
 $global:VIDS_OUTPUT  = ".mp4"
-$global:VIDS_IN_FPS  = 9000
+$global:ITSSCALE     = 0.01
 $global:VIDS_OUT_FPS = 30
-$global:VIDS_SOURCE  = "rtsp://10.1.1.1:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"
-$global:FAIL_TIMEOUT = 10
+$global:VIDS_SOURCE  = "rtsp://cptimelapse:cptimelapse@1.1.1.1:554/cam/realmonitor?channel=1&subtype=0&unicast=true&proto=Onvif"
+$global:FAIL_TIMEOUT = 3
+$global:TIME_LIMIT_S = "00:00:30"
 $global:LEDGER_FILE  = ".\ledger.txt"
 
 
@@ -21,7 +22,8 @@ function Get-NextName {
 function Start-Record {
     Out-File -FilePath $global:LEDGER_FILE -Encoding utf8 -Append -Force -NoClobber -InputObject "$((Get-Date).ToString()): $(Get-NextName)"
     Start-Process -FilePath ".\bin\ffmpeg.exe" -Wait -ArgumentList `
-    "-r", $global:VIDS_IN_FPS,
+    "-itsscale", $global:ITSSCALE,
+    "-t", $global:TIME_LIMIT_S,
     "-i", $global:VIDS_SOURCE,
     "-r", $global:VIDS_OUT_FPS,
     "$global:VIDS_FOLDER\$(Get-NextName)"

@@ -30,8 +30,8 @@ while ($true) {
     $response += "<?xml version=`"1.0`" encoding=`"UTF-8`" ?>"
     $response += "<rss version=`"2.0`">"
     $response += "<channel>"
-    $response += "    <title>Ouchies</title>"
-    $response += "    <link>https://cp-elastic</link>"
+    $response += "    <title>Zabbix Events</title>"
+    $response += "    <link>https://zabbix.com</link>"
     $response += "    <description>Ouchie boo boo's</description>"
     $response += "    <ttl>1</ttl>"
 

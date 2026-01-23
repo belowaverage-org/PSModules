@@ -1,4 +1,4 @@
- function Get-ADNestedGroups($DN) {
+function Get-ADNestedGroups($DN) {
     $groups = [System.Collections.Generic.Dictionary[string, [System.Collections.Generic.List[int]]]]::new()
     $parents = [System.Collections.Generic.Stack[string]]::new()
 
